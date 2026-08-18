@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>外科医 夜勤シフトスマート決定システム</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="logo-icon"><i data-lucide="cross"></i></div>
+        <div>
+          <h1>外科医 夜勤シフトマネージャー</h1>
+          <p class="subtitle">4名専用 ・ 2名/3名 ワンクリック最適化システム</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btn-mode-shift" class="btn btn-secondary active"><i data-lucide="calendar"></i> シフト作成</button>
+        <button id="btn-mode-unavail" class="btn btn-secondary"><i data-lucide="calendar-off"></i> 不可日登録</button>
+        <button id="btn-auto-generate" class="btn btn-primary pulse"><i data-lucide="sparkles"></i> 1クリック自動生成</button>
+        <button id="btn-share-link" class="btn btn-success"><i data-lucide="share-2"></i> 共有リンク発行</button>
+        <button id="btn-share-text" class="btn btn-outline"><i data-lucide="message-square"></i> テキスト共有</button>
+        <button id="btn-export-csv" class="btn btn-outline"><i data-lucide="download"></i> CSV</button>
+        <button id="btn-print" class="btn btn-outline"><i data-lucide="printer"></i> 印刷</button>
+      </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <div class="main-layout">
+      <!-- Sidebar / Doctor Stats Panel -->
+      <aside class="sidebar">
+        <div class="panel-card">
+          <div class="panel-header">
+            <h3><i data-lucide="users"></i> 担当外科医 (4名)</h3>
+            <span class="badge info">名簿設定</span>
+          </div>
+          <div id="doctor-list" class="doctor-list">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <div class="panel-header">
+            <h3><i data-lucide="bar-chart-3"></i> 月間集計＆公平性</h3>
+            <span id="current-month-label" class="badge">--年--月</span>
+          </div>
+          <div id="stats-summary" class="stats-summary">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <div class="panel-card guide-card">
+          <h4><i data-lucide="help-circle"></i> 操作ガイド</h4>
+          <ul class="guide-list">
+            <li><span class="highlight">ワンクリック決定:</span> 日付欄の医師チップをクリックするだけで、夜勤の決定・解除をトグル。</li>
+            <li><span class="highlight">不可日登録:</span> 「不可日登録」モードで医師を選択後、休みの日をワンクリック。</li>
+            <li><span class="highlight">自動生成:</span> 「1クリック自動生成」で連当回避・公平分配を全自動で作成！</li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- Calendar Main Area -->
+      <main class="calendar-area">
+        <!-- Calendar Controls Header -->
+        <div class="calendar-toolbar">
+          <div class="month-selector">
+            <button id="btn-prev-month" class="icon-btn"><i data-lucide="chevron-left"></i></button>
+            <h2 id="calendar-title">2026年 9月</h2>
+            <button id="btn-next-month" class="icon-btn"><i data-lucide="chevron-right"></i></button>
+            <button id="btn-today" class="btn btn-sm btn-ghost">今月</button>
+          </div>
+        </div>
+
+        <!-- Mode Indicator Banner -->
+        <div id="mode-banner" class="mode-banner shift-mode">
+          <i data-lucide="info"></i>
+          <span id="mode-banner-text">【シフト作成モード】カレンダー内の医師をクリックするだけで、ワンクリックで夜勤を決定・変更できます。</span>
+        </div>
+
+        <!-- Calendar Grid -->
+        <div class="calendar-card">
+          <div class="calendar-weekdays">
+            <div class="weekday sun">日</div>
+            <div class="weekday">月</div>
+            <div class="weekday">火</div>
+            <div class="weekday">水</div>
+            <div class="weekday">木</div>
+            <div class="weekday">金</div>
+            <div class="weekday sat">土</div>
+          </div>
+          <div id="calendar-grid" class="calendar-grid">
+            <!-- Days rendered by JS -->
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Doctor Edit Modal -->
+  <div id="modal-doctor-edit" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i data-lucide="user-cog"></i> 外科医プロフィールの編集</h3>
+        <button class="close-btn" onclick="closeDoctorModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-doctor-edit">
+          <input type="hidden" id="edit-doc-id">
+          <div class="form-group">
+            <label for="edit-doc-name">医師氏名 / 表示名</label>
+            <input type="text" id="edit-doc-name" required placeholder="例: 佐々木 医師">
+          </div>
+          <div class="form-group">
+            <label for="edit-doc-color">テーマカラー</label>
+            <div class="color-picker-grid">
+              <input type="color" id="edit-doc-color" value="#3b82f6">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeDoctorModal()">キャンセル</button>
+            <button type="submit" class="btn btn-primary">保存</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Day Quick Detail Modal / Mobile Popup -->
+  <div id="modal-day-detail" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="day-detail-title">9月15日の夜勤シフト設定</h3>
+        <button class="close-btn" onclick="closeDayModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="req-selector">
+          <label>この日の夜勤必要人数:</label>
+          <div class="segmented-control">
+            <button id="modal-req-2" class="seg-btn" onclick="setDayRequirementFromModal(2)">2名</button>
+            <button id="modal-req-3" class="seg-btn" onclick="setDayRequirementFromModal(3)">3名</button>
+          </div>
+        </div>
+        <h4>当直担当医師を選択 (ワンクリック):</h4>
+        <div id="modal-doctor-toggles" class="modal-doctor-toggles">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="closeDayModal()">完了</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=2"></script>
+</body>
+</html>
