@@ -384,7 +384,7 @@
           <i data-lucide="eye" style="color: #38bdf8;"></i>
           <div>
             <div class="menu-btn-title">勤務者のみ表示 (閲覧ビュー)</div>
-            <div class="menu-btn-sub">1画面ですっきり当直医のみを確認</div>
+            <div class="menu-btn-sub">1画面ですっきり勤務医のみを確認</div>
           </div>
         </button>
         <button class="menu-action-btn danger" onclick="closeMobileMenu(); clearCurrentMonthShifts();">
@@ -436,7 +436,7 @@
       </div>
       <div class="modal-body" style="padding: 0;">
         <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 0.6rem; text-align: center;">
-          💡 当直医のみをコンパクトにまとめた一画面閲覧ビューです
+          💡 勤務医のみをコンパクトにまとめた一画面閲覧ビューです
         </p>
         <!-- コンパクトカレンダー容器 -->
         <div id="compact-calendar-container"></div>
@@ -484,13 +484,13 @@
         </div>
 
         <div style="font-size: 0.75rem; color: var(--text-muted); background: rgba(56, 189, 248, 0.08); padding: 0.5rem 0.75rem; border-radius: 6px; border-left: 3px solid #38bdf8;">
-          💡 <b>.ics ファイル</b>をダウンロードすると、Googleカレンダーの「設定 → インポート」や、スマホのカレンダーアプリに一括で当直予定を追加できます。
+          💡 <b>.ics ファイル</b>をダウンロードすると、Googleカレンダーの「設定 → インポート」や、スマホのカレンダーアプリに一括で勤務予定を追加できます。
         </div>
 
         <!-- Googleカレンダー直接リンク一覧 -->
         <div>
           <h4 style="font-size: 0.88rem; font-weight: 600; color: #e2e8f0; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
-            <i data-lucide="external-link" style="width: 16px; height: 16px;"></i> 当直日ごとのGoogleカレンダー直接追加
+            <i data-lucide="external-link" style="width: 16px; height: 16px;"></i> 勤務日ごとのGoogleカレンダー直接追加
           </h4>
           <div id="gcal-direct-links-container" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.4rem; padding-right: 4px;">
             <!-- JSで動的描写 -->

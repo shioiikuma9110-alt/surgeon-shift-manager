@@ -665,7 +665,7 @@ function renderDayModalToggles(dateStr) {
 // 今月のシフト一括クリア（全削除）
 // ----------------------------------------------------
 function clearCurrentMonthShifts() {
-  if (!confirm(`${state.currentYear}年${state.currentMonth + 1}月の当直シフトをすべて削除しますか？`)) {
+  if (!confirm(`${state.currentYear}年${state.currentMonth + 1}月の勤務シフトをすべて削除しますか？`)) {
     return;
   }
   const monthData = ensureMonthData();
@@ -1152,7 +1152,7 @@ function renderCompactCalendar() {
   // モーダルタイトル更新
   const titleElem = document.getElementById('compact-view-title');
   if (titleElem) {
-    titleElem.innerHTML = `<i data-lucide="eye"></i> ${year}年${month + 1}月 確定当直表 (勤務者のみ)`;
+    titleElem.innerHTML = `<i data-lucide="eye"></i> ${year}年${month + 1}月 確定勤務表 (勤務者のみ)`;
   }
 
   const wrapper = document.createElement('div');
@@ -1248,7 +1248,7 @@ function openGcalModal() {
 
   const select = document.getElementById('gcal-doctor-select');
   if (select) {
-    select.innerHTML = '<option value="all">全員の当直</option>';
+    select.innerHTML = '<option value="all">全員の勤務</option>';
     doctors.forEach(doc => {
       const opt = document.createElement('option');
       opt.value = doc.id;
@@ -1307,7 +1307,7 @@ function renderGcalModalContent() {
   const shiftList = getShiftDatesForDoctor(selectDoc);
 
   if (shiftList.length === 0) {
-    container.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 0.82rem; padding: 1rem;">該当する当直シフトがありません</div>';
+    container.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 0.82rem; padding: 1rem;">該当する勤務シフトがありません</div>';
     return;
   }
 
@@ -1315,7 +1315,7 @@ function renderGcalModalContent() {
     const card = document.createElement('div');
     card.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.04); padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); font-size: 0.85rem;';
     
-    const titleText = `外科当直 (${item.docNamesStr})`;
+    const titleText = `外科勤務 (${item.docNamesStr})`;
     const gcalUrl = buildGoogleCalendarUrl(item.dateStr, titleText);
 
     card.innerHTML = `
@@ -1347,7 +1347,7 @@ function buildGoogleCalendarUrl(dateStr, title) {
   const endStr = `${ny}${String(nm).padStart(2, '0')}${String(nd).padStart(2, '0')}T090000`;
   const datesParam = `${startStr}/${endStr}`;
 
-  const details = `外科夜勤シフトマネージャーにより登録された当直予定です。`;
+  const details = `外科シフトマネージャーにより登録された勤務予定です。`;
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${datesParam}&details=${encodeURIComponent(details)}`;
 }
 
@@ -1356,7 +1356,7 @@ function downloadICSFile() {
   const shiftList = getShiftDatesForDoctor(selectDoc);
 
   if (shiftList.length === 0) {
-    showToast('⚠️ エクスポート対象の当直シフトがありません');
+    showToast('⚠️ エクスポート対象の勤務シフトがありません');
     return;
   }
 
@@ -1366,12 +1366,12 @@ function downloadICSFile() {
     'PRODID:-//Surgeon Shift Manager//NONSGML Shift Calendar v1.0//JA',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
-    'X-WR-CALNAME:外科当直シフト'
+    'X-WR-CALNAME:外科勤務シフト'
   ];
 
   shiftList.forEach((item, index) => {
     const [y, m, d] = item.dateStr.split('-').map(Number);
-    const summary = `【外科当直】${item.docNamesStr}`;
+    const summary = `【外科勤務】${item.docNamesStr}`;
     const uid = `shift-${item.dateStr}-${index}-${Date.now()}@surgeon-shift-manager`;
 
     const dtStart = `${y}${String(m).padStart(2, '0')}${String(d).padStart(2, '0')}T170000`;
@@ -1384,7 +1384,7 @@ function downloadICSFile() {
     icsLines.push('BEGIN:VEVENT');
     icsLines.push(`UID:${uid}`);
     icsLines.push(`SUMMARY:${summary}`);
-    icsLines.push(`DESCRIPTION:外科当直勤務 (${item.docNamesStr})`);
+    icsLines.push(`DESCRIPTION:外科勤務 (${item.docNamesStr})`);
     icsLines.push(`DTSTART:${dtStart}`);
     icsLines.push(`DTEND:${dtEnd}`);
     icsLines.push('END:VEVENT');
@@ -1396,8 +1396,8 @@ function downloadICSFile() {
   const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   
-  const docNameLabel = selectDoc === 'all' ? '全員' : (getDoctorById(selectDoc)?.name || '当直医');
-  const filename = `外科当直シフト_${state.currentYear}年${state.currentMonth + 1}月_${docNameLabel}.ics`;
+  const docNameLabel = selectDoc === 'all' ? '全員' : (getDoctorById(selectDoc)?.name || '勤務医');
+  const filename = `外科勤務シフト_${state.currentYear}年${state.currentMonth + 1}月_${docNameLabel}.ics`;
 
   const link = document.createElement('a');
   link.setAttribute('href', url);
@@ -1415,13 +1415,13 @@ function copyGcalText() {
   const shiftList = getShiftDatesForDoctor(selectDoc);
 
   if (shiftList.length === 0) {
-    showToast('⚠️ 対象の当直シフトがありません');
+    showToast('⚠️ 対象の勤務シフトがありません');
     return;
   }
 
   const docNameLabel = selectDoc === 'all' ? '全体' : (getDoctorById(selectDoc)?.name || '');
   
-  let text = `【外科当直予定 (${docNameLabel}) - ${state.currentYear}年${state.currentMonth + 1}月】\n\n`;
+  let text = `【外科勤務予定 (${docNameLabel}) - ${state.currentYear}年${state.currentMonth + 1}月】\n\n`;
 
   shiftList.forEach(item => {
     const [, m, d] = item.dateStr.split('-').map(Number);
@@ -1429,7 +1429,7 @@ function copyGcalText() {
   });
 
   navigator.clipboard.writeText(text).then(() => {
-    showToast('📋 当直予定テキストをクリップボードにコピーしました！');
+    showToast('📋 勤務予定テキストをクリップボードにコピーしました！');
   }).catch(() => {
     prompt('以下のテキストをコピーしてください:', text);
   });
