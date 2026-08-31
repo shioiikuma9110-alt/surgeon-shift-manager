@@ -21,6 +21,10 @@ let state = {
 
 // 初期化
 document.addEventListener('DOMContentLoaded', () => {
+  const now = new Date();
+  state.currentYear = now.getFullYear();
+  state.currentMonth = now.getMonth();
+
   doctors.forEach(d => { if (d.name) d.name = cleanDoctorName(d.name); });
   loadLocalStorage();
   doctors.forEach(d => { if (d.name) d.name = cleanDoctorName(d.name); });
@@ -150,9 +154,12 @@ function setupEventListeners() {
   document.getElementById('btn-prev-month')?.addEventListener('click', () => changeMonth(-1));
   document.getElementById('btn-next-month')?.addEventListener('click', () => changeMonth(1));
   document.getElementById('btn-today')?.addEventListener('click', () => {
-    state.currentYear = new Date().getFullYear();
-    state.currentMonth = new Date().getMonth();
+    const now = new Date();
+    state.currentYear = now.getFullYear();
+    state.currentMonth = now.getMonth();
     renderApp();
+    showToast(`📅 ${state.currentYear}年${state.currentMonth + 1}月（今月）を表示しました`);
+    document.querySelector('.calendar-area')?.scrollIntoView({ behavior: 'smooth' });
   });
 
   // 自動生成
