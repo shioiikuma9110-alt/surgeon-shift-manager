@@ -1322,7 +1322,7 @@ function renderGcalModalContent() {
       <div>
         <span style="font-weight: 700; color: #fff; margin-right: 0.4rem;">${state.currentMonth + 1}/${item.day} (${item.dayOfWeek})</span>
         <span style="color: #38bdf8; font-weight: 600;">${item.docNamesStr}</span>
-        <span style="font-size: 0.75rem; color: var(--text-muted); margin-left: 0.4rem;">17:00〜翌09:00</span>
+        <span style="font-size: 0.75rem; color: var(--text-muted); margin-left: 0.4rem;">(終日)</span>
       </div>
       <a href="${gcalUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-xs btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: #38bdf8; border-color: rgba(56,189,248,0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 0.2rem;">
         Googleカレンダーに追加 🔗
@@ -1338,13 +1338,13 @@ function buildGoogleCalendarUrl(dateStr, title) {
   // dateStr: "YYYY-MM-DD"
   const [y, m, d] = dateStr.split('-').map(Number);
   
-  // 当日 17:00 〜 翌日 09:00
-  const startStr = `${y}${String(m).padStart(2, '0')}${String(d).padStart(2, '0')}T170000`;
+  // 終日イベント: YYYYMMDD/YYYYMMDD (終了日は翌日日付)
+  const startStr = `${y}${String(m).padStart(2, '0')}${String(d).padStart(2, '0')}`;
   const nextDate = new Date(y, m - 1, d + 1);
   const ny = nextDate.getFullYear();
   const nm = nextDate.getMonth() + 1;
   const nd = nextDate.getDate();
-  const endStr = `${ny}${String(nm).padStart(2, '0')}${String(nd).padStart(2, '0')}T090000`;
+  const endStr = `${ny}${String(nm).padStart(2, '0')}${String(nd).padStart(2, '0')}`;
   const datesParam = `${startStr}/${endStr}`;
 
   const details = `外科シフトマネージャーにより登録された勤務予定です。`;
@@ -1374,19 +1374,19 @@ function downloadICSFile() {
     const summary = `【外科勤務】${item.docNamesStr}`;
     const uid = `shift-${item.dateStr}-${index}-${Date.now()}@surgeon-shift-manager`;
 
-    const dtStart = `${y}${String(m).padStart(2, '0')}${String(d).padStart(2, '0')}T170000`;
+    const dtStart = `${y}${String(m).padStart(2, '0')}${String(d).padStart(2, '0')}`;
     const nextDate = new Date(y, m - 1, d + 1);
     const ny = nextDate.getFullYear();
     const nm = nextDate.getMonth() + 1;
     const nd = nextDate.getDate();
-    const dtEnd = `${ny}${String(nm).padStart(2, '0')}${String(nd).padStart(2, '0')}T090000`;
+    const dtEnd = `${ny}${String(nm).padStart(2, '0')}${String(nd).padStart(2, '0')}`;
 
     icsLines.push('BEGIN:VEVENT');
     icsLines.push(`UID:${uid}`);
     icsLines.push(`SUMMARY:${summary}`);
     icsLines.push(`DESCRIPTION:外科勤務 (${item.docNamesStr})`);
-    icsLines.push(`DTSTART:${dtStart}`);
-    icsLines.push(`DTEND:${dtEnd}`);
+    icsLines.push(`DTSTART;VALUE=DATE:${dtStart}`);
+    icsLines.push(`DTEND;VALUE=DATE:${dtEnd}`);
     icsLines.push('END:VEVENT');
   });
 
@@ -1425,7 +1425,7 @@ function copyGcalText() {
 
   shiftList.forEach(item => {
     const [, m, d] = item.dateStr.split('-').map(Number);
-    text += `・${m}/${d}(${item.dayOfWeek}) 17:00〜翌09:00 : ${item.docNamesStr}\n`;
+    text += `・${m}/${d}(${item.dayOfWeek}) 終日 : ${item.docNamesStr}\n`;
   });
 
   navigator.clipboard.writeText(text).then(() => {
