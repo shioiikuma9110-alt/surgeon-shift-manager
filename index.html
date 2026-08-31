@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>外科医 夜勤シフトスマート決定システム</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>外科医 シフトスマート決定システム</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=20260824_3000">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
+
 <body>
   <div class="app-container">
     <!-- Header -->
@@ -18,63 +22,115 @@
       <div class="brand">
         <div class="logo-icon"><i data-lucide="cross"></i></div>
         <div>
-          <h1>外科医 夜勤シフトマネージャー</h1>
-          <p class="subtitle">4名専用 ・ 2名/3名 ワンクリック最適化システム</p>
+          <h1>シフトマネージャー</h1>
+          <p class="subtitle">4名専用 ワンクリック最適化システム</p>
         </div>
       </div>
-      <div class="header-actions">
+      <div class="header-actions desktop-only-actions">
         <button id="btn-mode-shift" class="btn btn-secondary active"><i data-lucide="calendar"></i> シフト作成</button>
         <button id="btn-mode-unavail" class="btn btn-secondary"><i data-lucide="calendar-off"></i> 不可日登録</button>
         <button id="btn-auto-generate" class="btn btn-primary pulse"><i data-lucide="sparkles"></i> 1クリック自動生成</button>
-        <button id="btn-share-link" class="btn btn-success"><i data-lucide="share-2"></i> 共有リンク発行</button>
-        <button id="btn-share-text" class="btn btn-outline"><i data-lucide="message-square"></i> テキスト共有</button>
-        <button id="btn-export-csv" class="btn btn-outline"><i data-lucide="download"></i> CSV</button>
-        <button id="btn-print" class="btn btn-outline"><i data-lucide="printer"></i> 印刷</button>
+        <button id="btn-view-compact" class="btn btn-success"><i data-lucide="eye"></i> 勤務者のみ表示</button>
+        <button id="btn-gcal-export" class="btn btn-outline desktop-only" style="border-color: #38bdf8; color: #38bdf8;"><i data-lucide="calendar-plus"></i> Googleカレンダー</button>
+        <button id="btn-share-link" class="btn btn-outline"><i data-lucide="share-2"></i> 共有</button>
+        <button id="btn-share-text" class="btn btn-outline desktop-only"><i data-lucide="message-square"></i>
+          テキスト共有</button>
+        <button id="btn-export-csv" class="btn btn-outline desktop-only"><i data-lucide="download"></i> CSV</button>
+        <button id="btn-print" class="btn btn-outline desktop-only"><i data-lucide="printer"></i> 印刷</button>
       </div>
     </header>
 
     <!-- Main Content Layout -->
     <div class="main-layout">
       <!-- Sidebar / Doctor Stats Panel -->
-      <aside class="sidebar">
-        <div class="panel-card">
-          <div class="panel-header">
-            <h3><i data-lucide="users"></i> 担当外科医 (4名)</h3>
-            <span class="badge info">名簿設定</span>
+      <aside class="sidebar" id="app-sidebar">
+        <div class="panel-card collapsible" id="panel-doctors">
+          <div class="panel-header" onclick="toggleAccordion('panel-doctors')">
+            <h3><i data-lucide="users"></i> 担当医 (4名)</h3>
+            <div class="panel-header-right">
+              <span class="badge info">名簿設定</span>
+              <i data-lucide="chevron-down" class="accordion-icon"></i>
+            </div>
           </div>
-          <div id="doctor-list" class="doctor-list">
-            <!-- Rendered by JS -->
+          <div class="panel-body">
+            <div id="doctor-list" class="doctor-list">
+              <!-- Rendered by JS -->
+            </div>
           </div>
         </div>
 
-        <div class="panel-card">
-          <div class="panel-header">
+        <div class="panel-card collapsible" id="panel-stats">
+          <div class="panel-header" onclick="toggleAccordion('panel-stats')">
             <h3><i data-lucide="bar-chart-3"></i> 月間集計＆公平性</h3>
-            <span id="current-month-label" class="badge">--年--月</span>
+            <div class="panel-header-right">
+              <span id="current-month-label" class="badge">--年--月</span>
+              <i data-lucide="chevron-down" class="accordion-icon"></i>
+            </div>
           </div>
-          <div id="stats-summary" class="stats-summary">
-            <!-- Rendered by JS -->
+          <div class="panel-body">
+            <div id="stats-summary" class="stats-summary">
+              <!-- Rendered by JS -->
+            </div>
           </div>
         </div>
 
-        <div class="panel-card guide-card">
-          <h4><i data-lucide="help-circle"></i> 操作ガイド</h4>
-          <ul class="guide-list">
-            <li><span class="highlight">ワンクリック決定:</span> 日付欄の医師チップをクリックするだけで、夜勤の決定・解除をトグル。</li>
-            <li><span class="highlight">不可日登録:</span> 「不可日登録」モードで医師を選択後、休みの日をワンクリック。</li>
-            <li><span class="highlight">自動生成:</span> 「1クリック自動生成」で連当回避・公平分配を全自動で作成！</li>
-          </ul>
+        <!-- 今月のシフト全削除ボタン -->
+        <div style="margin-bottom: 0.75rem;">
+          <button id="btn-clear-shifts" class="btn btn-outline-danger w-100" onclick="clearCurrentMonthShifts()"
+            style="padding: 0.7rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.5rem; border-radius: var(--radius-md); background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171;">
+            <i data-lucide="trash-2"></i> 今月のシフトを全削除
+          </button>
+        </div>
+
+        <div class="panel-card guide-card collapsible collapsed" id="panel-guide">
+          <div class="panel-header" onclick="toggleAccordion('panel-guide')">
+            <h4><i data-lucide="help-circle"></i> 操作ガイド</h4>
+            <i data-lucide="chevron-down" class="accordion-icon"></i>
+          </div>
+          <div class="panel-body">
+            <ul class="guide-list">
+              <li><span class="highlight">ワンクリック決定:</span> 日付欄の医師チップをクリックするだけで、夜勤の決定・解除をトグル。</li>
+              <li><span class="highlight">不可日登録:</span> 「不可日登録」モードで医師を選択後、休みの日をワンクリック。</li>
+              <li><span class="highlight">自動生成:</span> 「1クリック自動生成」で連当回避・公平分配を全自動で作成！</li>
+            </ul>
+          </div>
         </div>
       </aside>
 
       <!-- Calendar Main Area -->
       <main class="calendar-area">
+        <!-- Mobile Mode Selector Tab Bar -->
+        <div class="mobile-mode-tabs mobile-only">
+          <button id="btn-mobile-mode-shift" class="tab-btn active" onclick="setMode('shift')">
+            <i data-lucide="calendar"></i> シフト作成
+          </button>
+          <button id="btn-mobile-mode-unavail" class="tab-btn" onclick="setMode('unavail')">
+            <i data-lucide="calendar-off"></i> 不可日登録
+          </button>
+        </div>
+
+        <!-- Mobile Quick Actions Bar -->
+        <div class="mobile-actions-bar mobile-only" style="grid-template-columns: repeat(4, 1fr); gap: 0.35rem;">
+          <button id="btn-mobile-auto-gen" class="btn btn-primary pulse" onclick="openAutoGenerateModal()" style="padding: 0.5rem 0.2rem; font-size: 0.72rem;">
+            <i data-lucide="sparkles"></i> 自動生成
+          </button>
+          <button id="btn-mobile-view-compact" class="btn btn-success" onclick="openCompactViewModal()" style="padding: 0.5rem 0.2rem; font-size: 0.72rem;">
+            <i data-lucide="eye"></i> 勤務者のみ
+          </button>
+          <button id="btn-mobile-gcal" class="btn btn-outline" onclick="openGcalModal()" style="padding: 0.5rem 0.2rem; font-size: 0.72rem; border-color: #38bdf8; color: #38bdf8;">
+            <i data-lucide="calendar-plus"></i> カレンダー
+          </button>
+          <button id="btn-mobile-share" class="btn btn-outline" onclick="exportShareLink()" style="padding: 0.5rem 0.2rem; font-size: 0.72rem;">
+            <i data-lucide="share-2"></i> 共有
+          </button>
+        </div>
+
         <!-- Calendar Controls Header -->
         <div class="calendar-toolbar">
           <div class="month-selector">
-            <button id="btn-prev-month" class="icon-btn"><i data-lucide="chevron-left"></i></button>
+            <button id="btn-prev-month" class="icon-btn" aria-label="前月"><i data-lucide="chevron-left"></i></button>
             <h2 id="calendar-title">2026年 9月</h2>
-            <button id="btn-next-month" class="icon-btn"><i data-lucide="chevron-right"></i></button>
+            <button id="btn-next-month" class="icon-btn" aria-label="次月"><i data-lucide="chevron-right"></i></button>
             <button id="btn-today" class="btn btn-sm btn-ghost">今月</button>
           </div>
         </div>
@@ -82,7 +138,7 @@
         <!-- Mode Indicator Banner -->
         <div id="mode-banner" class="mode-banner shift-mode">
           <i data-lucide="info"></i>
-          <span id="mode-banner-text">【シフト作成モード】カレンダー内の医師をクリックするだけで、ワンクリックで夜勤を決定・変更できます。</span>
+          <span id="mode-banner-text">【勤務シフト作成モード】カレンダー内の名前をタップするだけで、勤務のON/OFFを切り替えられます。</span>
         </div>
 
         <!-- Calendar Grid -->
@@ -102,21 +158,22 @@
         </div>
       </main>
     </div>
+
   </div>
 
   <!-- Doctor Edit Modal -->
   <div id="modal-doctor-edit" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3><i data-lucide="user-cog"></i> 外科医プロフィールの編集</h3>
+        <h3><i data-lucide="user-cog"></i> 担当医プロフィールの編集</h3>
         <button class="close-btn" onclick="closeDoctorModal()">&times;</button>
       </div>
       <div class="modal-body">
         <form id="form-doctor-edit">
           <input type="hidden" id="edit-doc-id">
           <div class="form-group">
-            <label for="edit-doc-name">医師氏名 / 表示名</label>
-            <input type="text" id="edit-doc-name" required placeholder="例: 佐々木 医師">
+            <label for="edit-doc-name">氏名 / 表示名</label>
+            <input type="text" id="edit-doc-name" required placeholder="例: 佐々木">
           </div>
           <div class="form-group">
             <label for="edit-doc-color">テーマカラー</label>
@@ -142,13 +199,13 @@
       </div>
       <div class="modal-body">
         <div class="req-selector">
-          <label>この日の夜勤必要人数:</label>
+          <label>この日の必要勤務人数:</label>
           <div class="segmented-control">
             <button id="modal-req-2" class="seg-btn" onclick="setDayRequirementFromModal(2)">2名</button>
             <button id="modal-req-3" class="seg-btn" onclick="setDayRequirementFromModal(3)">3名</button>
           </div>
         </div>
-        <h4>当直担当医師を選択 (ワンクリック):</h4>
+        <h4>勤務担当を選択:</h4>
         <div id="modal-doctor-toggles" class="modal-doctor-toggles">
           <!-- Rendered by JS -->
         </div>
@@ -159,6 +216,295 @@
     </div>
   </div>
 
-  <script src="app.js?v=2"></script>
+  <!-- Auto Generate Settings Modal -->
+  <div id="modal-auto-generate" class="modal bottom-sheet-modal">
+    <div class="modal-content bottom-sheet-content">
+      <div class="modal-header">
+        <h3><i data-lucide="sparkles"></i> 曜日別自動生成・人数設定</h3>
+        <button class="close-btn" onclick="closeAutoGenerateModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+          自動生成したい曜日と、各曜日の<strong>必要勤務人数</strong>を指定してください。<br>チェックした曜日だけを自動生成し、未チェックの曜日は変更されません。
+        </p>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.75rem;">
+          <label style="font-weight:600; color:#fff; font-size:0.9rem;">対象曜日・必要人数の設定:</label>
+          <div style="display:flex; gap:0.4rem;">
+            <button type="button" class="btn btn-sm btn-ghost" onclick="selectAllAutoDays(true)">全選択</button>
+            <button type="button" class="btn btn-sm btn-ghost" onclick="selectAllAutoDays(false)">全解除</button>
+          </div>
+        </div>
+
+        <div class="weekday-settings-list">
+          <!-- 日曜日 -->
+          <div class="weekday-setting-item sun">
+            <label class="weekday-check-label">
+              <input type="checkbox" id="chk-auto-dow-0" value="0" checked>
+              <span class="day-name">日曜日</span>
+            </label>
+            <div class="req-segmented">
+              <span class="req-label">必要人数:</span>
+              <div class="seg-group">
+                <button type="button" class="seg-opt" id="seg-dow-0-1" onclick="setDowReq(0, 1)">1名</button>
+                <button type="button" class="seg-opt active" id="seg-dow-0-2" onclick="setDowReq(0, 2)">2名</button>
+                <button type="button" class="seg-opt" id="seg-dow-0-3" onclick="setDowReq(0, 3)">3名</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 月曜日 -->
+          <div class="weekday-setting-item">
+            <label class="weekday-check-label">
+              <input type="checkbox" id="chk-auto-dow-1" value="1" checked>
+              <span class="day-name">月曜日</span>
+            </label>
+            <div class="req-segmented">
+              <span class="req-label">必要人数:</span>
+              <div class="seg-group">
+                <button type="button" class="seg-opt" id="seg-dow-1-1" onclick="setDowReq(1, 1)">1名</button>
+                <button type="button" class="seg-opt active" id="seg-dow-1-2" onclick="setDowReq(1, 2)">2名</button>
+                <button type="button" class="seg-opt" id="seg-dow-1-3" onclick="setDowReq(1, 3)">3名</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 火曜日 -->
+          <div class="weekday-setting-item">
+            <label class="weekday-check-label">
+              <input type="checkbox" id="chk-auto-dow-2" value="2" checked>
+              <span class="day-name">火曜日</span>
+            </label>
+            <div class="req-segmented">
+              <span class="req-label">必要人数:</span>
+              <div class="seg-group">
+                <button type="button" class="seg-opt" id="seg-dow-2-1" onclick="setDowReq(2, 1)">1名</button>
+                <button type="button" class="seg-opt active" id="seg-dow-2-2" onclick="setDowReq(2, 2)">2名</button>
+                <button type="button" class="seg-opt" id="seg-dow-2-3" onclick="setDowReq(2, 3)">3名</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 水曜日 -->
+          <div class="weekday-setting-item">
+            <label class="weekday-check-label">
+              <input type="checkbox" id="chk-auto-dow-3" value="3" checked>
+              <span class="day-name">水曜日</span>
+            </label>
+            <div class="req-segmented">
+              <span class="req-label">必要人数:</span>
+              <div class="seg-group">
+                <button type="button" class="seg-opt" id="seg-dow-3-1" onclick="setDowReq(3, 1)">1名</button>
+                <button type="button" class="seg-opt active" id="seg-dow-3-2" onclick="setDowReq(3, 2)">2名</button>
+                <button type="button" class="seg-opt" id="seg-dow-3-3" onclick="setDowReq(3, 3)">3名</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 木曜日 -->
+          <div class="weekday-setting-item">
+            <label class="weekday-check-label">
+              <input type="checkbox" id="chk-auto-dow-4" value="4" checked>
+              <span class="day-name">木曜日</span>
+            </label>
+            <div class="req-segmented">
+              <span class="req-label">必要人数:</span>
+              <div class="seg-group">
+                <button type="button" class="seg-opt" id="seg-dow-4-1" onclick="setDowReq(4, 1)">1名</button>
+                <button type="button" class="seg-opt active" id="seg-dow-4-2" onclick="setDowReq(4, 2)">2名</button>
+                <button type="button" class="seg-opt" id="seg-dow-4-3" onclick="setDowReq(4, 3)">3名</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 金曜日 -->
+          <div class="weekday-setting-item">
+            <label class="weekday-check-label">
+              <input type="checkbox" id="chk-auto-dow-5" value="5" checked>
+              <span class="day-name">金曜日</span>
+            </label>
+            <div class="req-segmented">
+              <span class="req-label">必要人数:</span>
+              <div class="seg-group">
+                <button type="button" class="seg-opt" id="seg-dow-5-1" onclick="setDowReq(5, 1)">1名</button>
+                <button type="button" class="seg-opt active" id="seg-dow-5-2" onclick="setDowReq(5, 2)">2名</button>
+                <button type="button" class="seg-opt" id="seg-dow-5-3" onclick="setDowReq(5, 3)">3名</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 土曜日 -->
+          <div class="weekday-setting-item sat">
+            <label class="weekday-check-label">
+              <input type="checkbox" id="chk-auto-dow-6" value="6" checked>
+              <span class="day-name">土曜日</span>
+            </label>
+            <div class="req-segmented">
+              <span class="req-label">必要人数:</span>
+              <div class="seg-group">
+                <button type="button" class="seg-opt" id="seg-dow-6-1" onclick="setDowReq(6, 1)">1名</button>
+                <button type="button" class="seg-opt active" id="seg-dow-6-2" onclick="setDowReq(6, 2)">2名</button>
+                <button type="button" class="seg-opt" id="seg-dow-6-3" onclick="setDowReq(6, 3)">3名</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          style="font-size:0.78rem; color:var(--text-muted); background:rgba(255,255,255,0.04); padding:0.65rem 0.85rem; border-radius:8px; margin-top:0.85rem;">
+          💡 チェックを入れた曜日の日付のみ自動更新され、他の曜日のシフトはそのまま残ります。
+        </div>
+      </div>
+      <div class="modal-footer" style="display:flex; gap:0.5rem; justify-content:flex-end;">
+        <button type="button" class="btn btn-secondary" onclick="closeAutoGenerateModal()">キャンセル</button>
+        <button type="button" id="btn-exec-auto-gen" class="btn btn-primary pulse"
+          onclick="executeAutoGenerateWithSettings()">
+          <i data-lucide="sparkles"></i> 生成
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Action Menu Modal / Sheet -->
+  <div id="modal-mobile-menu" class="modal bottom-sheet-modal">
+    <div class="modal-content bottom-sheet-content">
+      <div class="modal-header">
+        <h3><i data-lucide="menu"></i> その他の操作・エクスポート</h3>
+        <button class="close-btn" onclick="closeMobileMenu()">&times;</button>
+      </div>
+      <div class="modal-body mobile-menu-body">
+        <button class="menu-action-btn" onclick="closeMobileMenu(); openGcalModal();">
+          <i data-lucide="calendar-plus" style="color: #38bdf8;"></i>
+          <div>
+            <div class="menu-btn-title">Googleカレンダー連携</div>
+            <div class="menu-btn-sub">.icsファイル出力・直リンク追加</div>
+          </div>
+        </button>
+        <button class="menu-action-btn" onclick="closeMobileMenu(); openCompactViewModal();">
+          <i data-lucide="eye" style="color: #38bdf8;"></i>
+          <div>
+            <div class="menu-btn-title">勤務者のみ表示 (閲覧ビュー)</div>
+            <div class="menu-btn-sub">1画面ですっきり当直医のみを確認</div>
+          </div>
+        </button>
+        <button class="menu-action-btn danger" onclick="closeMobileMenu(); clearCurrentMonthShifts();">
+          <i data-lucide="trash-2" style="color: #ef4444;"></i>
+          <div>
+            <div class="menu-btn-title" style="color: #ef4444;">今月のシフトを全削除</div>
+            <div class="menu-btn-sub">当月の割り当てをクリアします</div>
+          </div>
+        </button>
+        <button class="menu-action-btn" onclick="closeMobileMenu(); exportTextShare();">
+          <i data-lucide="message-square"></i>
+          <div>
+            <div class="menu-btn-title">LINE/テキスト共有</div>
+            <div class="menu-btn-sub">テキスト形式でシフトをコピー</div>
+          </div>
+        </button>
+        <button class="menu-action-btn" onclick="closeMobileMenu(); exportCSV();">
+          <i data-lucide="download"></i>
+          <div>
+            <div class="menu-btn-title">CSVファイル出力</div>
+            <div class="menu-btn-sub">Excel等で開けるCSVをダウンロード</div>
+          </div>
+        </button>
+        <button class="menu-action-btn" onclick="closeMobileMenu(); window.print();">
+          <i data-lucide="printer"></i>
+          <div>
+            <div class="menu-btn-title">印刷 / PDF保存</div>
+            <div class="menu-btn-sub">A4サイズで印刷出力</div>
+          </div>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary w-100" onclick="closeMobileMenu()">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 勤務者のみ一画面閲覧モーダル (全画面コンパクトビュー) -->
+  <div id="modal-compact-view" class="modal">
+    <div class="modal-content compact-view-content"
+      style="max-width: 95vw; width: 480px; padding: 1rem; background: #0f172a; border-radius: 16px; border: 1px solid var(--border-color);">
+      <div class="modal-header"
+        style="margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
+        <h3 id="compact-view-title"
+          style="font-size: 1.05rem; font-weight: 700; color: #38bdf8; display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="eye"></i> 確定シフト一覧 (勤務者のみ)
+        </h3>
+        <button class="close-btn" onclick="closeCompactViewModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 0;">
+        <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 0.6rem; text-align: center;">
+          💡 当直医のみをコンパクトにまとめた一画面閲覧ビューです
+        </p>
+        <!-- コンパクトカレンダー容器 -->
+        <div id="compact-calendar-container"></div>
+      </div>
+      <div class="modal-footer"
+        style="margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+        <button type="button" class="btn btn-outline btn-sm" onclick="window.print()"><i data-lucide="printer"></i>
+          印刷</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="closeCompactViewModal()">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Googleカレンダー連携モーダル -->
+  <div id="modal-gcal" class="modal">
+    <div class="modal-content gcal-modal-content"
+      style="max-width: 95vw; width: 520px; padding: 1.25rem; background: #0f172a; border-radius: 16px; border: 1px solid var(--border-color);">
+      <div class="modal-header"
+        style="margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: #38bdf8; display: flex; align-items: center; gap: 0.5rem;">
+          <i data-lucide="calendar-plus"></i> Googleカレンダー・連携エクスポート
+        </h3>
+        <button class="close-btn" onclick="closeGcalModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 0; display: flex; flex-direction: column; gap: 1rem;">
+        
+        <!-- 医師選択フォーム -->
+        <div class="gcal-controls" style="background: rgba(255,255,255,0.03); padding: 0.85rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);">
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">対象の医師</label>
+            <select id="gcal-doctor-select" class="form-select" onchange="renderGcalModalContent()" style="width: 100%; padding: 0.5rem; background: #1e293b; color: #fff; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.9rem;">
+              <!-- JSで更新 -->
+            </select>
+          </div>
+        </div>
+
+        <!-- 一括エクスポートアクション -->
+        <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+          <button type="button" id="btn-gcal-download-ics" onclick="downloadICSFile()" class="btn btn-primary" style="flex: 1; min-width: 200px; padding: 0.65rem 0.8rem; font-size: 0.88rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+            <i data-lucide="download"></i> .ics一括ダウンロード
+          </button>
+          <button type="button" onclick="copyGcalText()" class="btn btn-outline" style="padding: 0.65rem 0.8rem; font-size: 0.88rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+            <i data-lucide="copy"></i> テキストコピー
+          </button>
+        </div>
+
+        <div style="font-size: 0.75rem; color: var(--text-muted); background: rgba(56, 189, 248, 0.08); padding: 0.5rem 0.75rem; border-radius: 6px; border-left: 3px solid #38bdf8;">
+          💡 <b>.ics ファイル</b>をダウンロードすると、Googleカレンダーの「設定 → インポート」や、スマホのカレンダーアプリに一括で当直予定を追加できます。
+        </div>
+
+        <!-- Googleカレンダー直接リンク一覧 -->
+        <div>
+          <h4 style="font-size: 0.88rem; font-weight: 600; color: #e2e8f0; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
+            <i data-lucide="external-link" style="width: 16px; height: 16px;"></i> 当直日ごとのGoogleカレンダー直接追加
+          </h4>
+          <div id="gcal-direct-links-container" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.4rem; padding-right: 4px;">
+            <!-- JSで動的描写 -->
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer" style="margin-top: 1rem; padding-top: 0.6rem; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeGcalModal()">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=20260824_4000"></script>
 </body>
+
 </html>
