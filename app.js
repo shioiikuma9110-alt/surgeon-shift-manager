@@ -1322,7 +1322,7 @@ function renderGcalModalContent() {
     const card = document.createElement('div');
     card.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.04); padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); font-size: 0.85rem;';
     
-    const titleText = `外科勤務 (${item.docNamesStr})`;
+    const titleText = item.docNamesStr;
     const gcalUrl = buildGoogleCalendarUrl(item.dateStr, titleText);
 
     card.innerHTML = `
@@ -1354,7 +1354,7 @@ function buildGoogleCalendarUrl(dateStr, title) {
   const endStr = `${ny}${String(nm).padStart(2, '0')}${String(nd).padStart(2, '0')}`;
   const datesParam = `${startStr}/${endStr}`;
 
-  const details = `外科シフトマネージャーにより登録された勤務予定です。`;
+  const details = `勤務予定 (${title})`;
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${datesParam}&details=${encodeURIComponent(details)}`;
 }
 
@@ -1373,12 +1373,12 @@ function downloadICSFile() {
     'PRODID:-//Surgeon Shift Manager//NONSGML Shift Calendar v1.0//JA',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
-    'X-WR-CALNAME:外科勤務シフト'
+    'X-WR-CALNAME:勤務シフト'
   ];
 
   shiftList.forEach((item, index) => {
     const [y, m, d] = item.dateStr.split('-').map(Number);
-    const summary = `【外科勤務】${item.docNamesStr}`;
+    const summary = item.docNamesStr;
     const uid = `shift-${item.dateStr}-${index}-${Date.now()}@surgeon-shift-manager`;
 
     const dtStart = `${y}${String(m).padStart(2, '0')}${String(d).padStart(2, '0')}`;
@@ -1391,7 +1391,7 @@ function downloadICSFile() {
     icsLines.push('BEGIN:VEVENT');
     icsLines.push(`UID:${uid}`);
     icsLines.push(`SUMMARY:${summary}`);
-    icsLines.push(`DESCRIPTION:外科勤務 (${item.docNamesStr})`);
+    icsLines.push(`DESCRIPTION:勤務予定 (${item.docNamesStr})`);
     icsLines.push(`DTSTART;VALUE=DATE:${dtStart}`);
     icsLines.push(`DTEND;VALUE=DATE:${dtEnd}`);
     icsLines.push('END:VEVENT');
